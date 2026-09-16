@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>悠閒時光社團戰</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%91%BC%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap">
 <style>
   :root{
     --bg:#F6F4FC; --surface:#FFFFFF; --surface-2:#F0EDFB; --border:#E1DAF4;
@@ -38,24 +38,64 @@
   }
   .wrap{max-width:880px; margin:0 auto; display:flex; flex-direction:column; gap:24px;}
 
-  .hero{display:flex; flex-direction:column; gap:10px; align-items:flex-start;}
-  .eyebrow{
-    font-size:12.5px; letter-spacing:.14em; color:var(--accent-strong); font-weight:600;
-    display:flex; align-items:center; gap:8px; text-transform:uppercase;
+  .hero{
+    position:relative; overflow:hidden; isolation:isolate;
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px;
+    padding:34px 20px 30px; border-radius:24px;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 55%),
+      linear-gradient(160deg, #BEEBFF 0%, #6FC3F2 42%, #2E86D6 78%, #1B5FB0 100%);
+    box-shadow:0 16px 36px -8px rgba(23,84,163,.5), inset 0 1px 0 rgba(255,255,255,.5);
   }
-  .eyebrow svg{width:16px; height:16px; flex:none;}
+  .hero .sparkle{
+    position:absolute; color:#fff; opacity:.9; line-height:1;
+    text-shadow:0 0 6px rgba(255,255,255,.8); z-index:0; pointer-events:none;
+  }
+  .hero .emblem{position:relative; z-index:1; width:58px; height:auto; filter:drop-shadow(0 3px 4px rgba(20,60,110,.35));}
+  .badge{
+    position:relative; z-index:1;
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,.24); border:1px solid rgba(255,255,255,.55);
+    color:#fff; font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    padding:5px 14px; border-radius:999px; backdrop-filter:blur(2px);
+  }
   h1{
-    font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(24px,4vw,32px);
-    margin:0; text-wrap:balance; letter-spacing:.01em;
+    position:relative; z-index:1;
+    font-family:"Noto Sans TC",sans-serif; font-weight:900; font-size:clamp(28px,6vw,42px);
+    margin:2px 0 0; text-wrap:balance; letter-spacing:.03em; line-height:1.15;
+    color:#FFDE66;
+    -webkit-text-stroke:2px #17488C; text-stroke:2px #17488C; paint-order:stroke fill;
+    text-shadow:0 4px 0 #123A70, 0 10px 18px rgba(10,40,85,.4);
   }
-  .sub{color:var(--text-soft); font-size:14.5px; margin:0; line-height:1.6;}
+  .hero .sub{
+    position:relative; z-index:1; color:#fff; font-size:17px; font-weight:700; margin:4px 0 0;
+    line-height:1.5; max-width:480px; text-shadow:0 2px 4px rgba(10,40,85,.45);
+  }
+  .schedule-row{
+    position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:10px;
+    justify-content:center; margin-top:10px;
+  }
+  .schedule-chip{
+    display:inline-flex; align-items:baseline; gap:6px;
+    background:#fff; color:#17488C; font-weight:800; font-size:16px;
+    padding:8px 16px; border-radius:999px; border:2px solid #FFDE66;
+    box-shadow:0 4px 12px rgba(10,40,85,.3);
+  }
+  .schedule-chip .day{color:#D6890A; font-size:12.5px; font-weight:700; letter-spacing:.03em;}
+  @media (max-width:480px){
+    .schedule-chip{font-size:14px; padding:7px 13px;}
+  }
 
   .toolbar{
-    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    position:relative; display:flex; align-items:center; justify-content:flex-end;
+    gap:12px; flex-wrap:wrap; min-height:54px;
     background:var(--surface); border:1px solid var(--border); border-radius:16px;
     padding:10px 14px; box-shadow:var(--shadow);
   }
-  .weeknav{display:flex; align-items:center; gap:10px;}
+  .weeknav{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    display:flex; align-items:center; gap:10px;
+  }
   .navbtn{
     width:34px; height:34px; border-radius:10px; border:1px solid var(--border);
     background:var(--surface-2); color:var(--text); display:flex; align-items:center; justify-content:center;
@@ -178,7 +218,8 @@
 
   @media (max-width:480px){
     .lists{grid-template-columns:1fr;}
-    .toolbar{flex-direction:column; align-items:stretch;}
+    .toolbar{flex-direction:column; align-items:stretch; position:static; min-height:0;}
+    .weeknav{position:static; transform:none; justify-content:center;}
     .admintoggle{justify-content:center;}
   }
 </style>
@@ -186,9 +227,24 @@
 <body>
 <div class="wrap" id="root">
   <div class="hero">
-    <div class="eyebrow">天使之戀・悠閒時光</div>
+    <span class="sparkle" style="top:14%;left:9%;font-size:16px;">✦</span>
+    <span class="sparkle" style="top:20%;left:87%;font-size:11px;">✧</span>
+    <span class="sparkle" style="top:68%;left:6%;font-size:10px;">✧</span>
+    <span class="sparkle" style="top:76%;left:91%;font-size:15px;">✦</span>
+    <span class="sparkle" style="top:6%;left:48%;font-size:9px;">✧</span>
+    <svg class="emblem" viewBox="0 0 120 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M60 30 C50 14 30 10 14 16 C4 20 2 32 10 40 C18 48 34 50 44 44 C50 40 54 35 60 30Z" fill="#fff" opacity=".92"/>
+      <path d="M60 30 C70 14 90 10 106 16 C116 20 118 32 110 40 C102 48 86 50 76 44 C70 40 66 35 60 30Z" fill="#fff" opacity=".92"/>
+      <path d="M60 50c-3 0-17-9-17-21 0-6.5 5.2-11 11-11 2.6 0 5 1.2 6 3.4 1-2.2 3.4-3.4 6-3.4 5.8 0 11 4.5 11 11 0 12-14 21-17 21z" fill="#FFDE66" stroke="#17488C" stroke-width="2.5" stroke-linejoin="round"/>
+    </svg>
+    <div class="badge">天使之戀 × 悠閒時光</div>
     <h1>社團戰出席表</h1>
     <p class="sub">載入中…</p>
+    <div class="schedule-row">
+      <span class="schedule-chip"><span class="day">週三</span>21:00</span>
+      <span class="schedule-chip"><span class="day">週日</span>09:00</span>
+      <span class="schedule-chip"><span class="day">週日</span>15:00</span>
+    </div>
   </div>
 </div>
 
@@ -310,7 +366,17 @@
 
     var html = "";
     html += '<div class="hero">';
-    html += '  <div class="eyebrow">天使之戀・悠閒時光</div>';
+    html += '  <span class="sparkle" style="top:14%;left:9%;font-size:16px;">✦</span>';
+    html += '  <span class="sparkle" style="top:20%;left:87%;font-size:11px;">✧</span>';
+    html += '  <span class="sparkle" style="top:68%;left:6%;font-size:10px;">✧</span>';
+    html += '  <span class="sparkle" style="top:76%;left:91%;font-size:15px;">✦</span>';
+    html += '  <span class="sparkle" style="top:6%;left:48%;font-size:9px;">✧</span>';
+    html += '  <svg class="emblem" viewBox="0 0 120 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+    html += '    <path d="M60 30 C50 14 30 10 14 16 C4 20 2 32 10 40 C18 48 34 50 44 44 C50 40 54 35 60 30Z" fill="#fff" opacity=".92"/>';
+    html += '    <path d="M60 30 C70 14 90 10 106 16 C116 20 118 32 110 40 C102 48 86 50 76 44 C70 40 66 35 60 30Z" fill="#fff" opacity=".92"/>';
+    html += '    <path d="M60 50c-3 0-17-9-17-21 0-6.5 5.2-11 11-11 2.6 0 5 1.2 6 3.4 1-2.2 3.4-3.4 6-3.4 5.8 0 11 4.5 11 11 0 12-14 21-17 21z" fill="#FFDE66" stroke="#17488C" stroke-width="2.5" stroke-linejoin="round"/>';
+    html += "  </svg>";
+    html += '  <div class="badge">天使之戀 × 悠閒時光</div>';
     html += "  <h1>社團戰出席表</h1>";
     html += '  <p class="sub">每週三 21:00・週日 09:00 / 15:00 社團戰,回報或查看本週出席狀況。</p>';
     html += "</div>";
