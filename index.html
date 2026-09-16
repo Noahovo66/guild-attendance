@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>悠閒時光社團戰</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%91%BC%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#F6F4FC; --surface:#FFFFFF; --surface-2:#F0EDFB; --border:#E1DAF4;
+    --text:#2A2740; --text-soft:#6B6685; --text-faint:#9791B5;
+    --accent:#6E5DD8; --accent-strong:#584AC0; --accent-soft:#EDE9FB;
+    --gold:#A97A12; --gold-soft:#FBF1DA; --gold-chip:#7A5A0C;
+    --leave:#9C4C5D; --leave-soft:#FBEAEE; --leave-chip:#7A3B49;
+    --shadow:0 1px 2px rgba(42,39,64,.05), 0 10px 28px rgba(42,39,64,.07);
+    --danger:#B3435A;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#161329; --surface:#1F1A38; --surface-2:#251F42; --border:#372F58;
+      --text:#EDEAF9; --text-soft:#B0A9CE; --text-faint:#7E77A0;
+      --accent:#A79BFF; --accent-strong:#BDB2FF; --accent-soft:#2B2550;
+      --gold:#E8C468; --gold-soft:#392F1E; --gold-chip:#F2D48A;
+      --leave:#E3899C; --leave-soft:#3A2530; --leave-chip:#F0AABA;
+      --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 28px rgba(0,0,0,.35);
+      --danger:#F0879B;
+      color-scheme: dark;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{height:auto;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:"Noto Sans TC","Noto Serif TC",system-ui,sans-serif;
+    padding:0 20px; padding-block:28px 60px;
+  }
+  .wrap{max-width:880px; margin:0 auto; display:flex; flex-direction:column; gap:24px;}
+
+  .hero{display:flex; flex-direction:column; gap:10px; align-items:flex-start;}
+  .eyebrow{
+    font-size:12.5px; letter-spacing:.14em; color:var(--accent-strong); font-weight:600;
+    display:flex; align-items:center; gap:8px; text-transform:uppercase;
+  }
+  .eyebrow svg{width:16px; height:16px; flex:none;}
+  h1{
+    font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(24px,4vw,32px);
+    margin:0; text-wrap:balance; letter-spacing:.01em;
+  }
+  .sub{color:var(--text-soft); font-size:14.5px; margin:0; line-height:1.6;}
+
+  .toolbar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:10px 14px; box-shadow:var(--shadow);
+  }
+  .weeknav{display:flex; align-items:center; gap:10px;}
+  .navbtn{
+    width:34px; height:34px; border-radius:10px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--text); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; flex:none;
+  }
+  .navbtn:hover{border-color:var(--accent);}
+  .navbtn svg{width:16px; height:16px;}
+  .weeklabel{display:flex; flex-direction:column; align-items:center; min-width:150px;}
+  .weeklabel .range{font-weight:600; font-size:14.5px; font-variant-numeric:tabular-nums;}
+  .pill{
+    font-size:11px; font-weight:600; color:var(--accent-strong); background:var(--accent-soft);
+    padding:2px 9px; border-radius:999px; margin-top:2px; letter-spacing:.02em;
+  }
+  .admintoggle{
+    display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600;
+    color:var(--text-soft); background:transparent; border:1px solid var(--border);
+    border-radius:10px; padding:7px 12px; cursor:pointer;
+  }
+  .admintoggle.on{color:var(--accent-strong); border-color:var(--accent); background:var(--accent-soft);}
+  .admintoggle svg{width:14px; height:14px;}
+
+  .pinbar{
+    display:flex; gap:8px; align-items:center; background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:10px 14px; box-shadow:var(--shadow); flex-wrap:wrap;
+  }
+  .pinbar input{
+    border:1px solid var(--border); border-radius:9px; padding:7px 10px; font-size:14px;
+    background:var(--bg); color:var(--text); width:140px;
+  }
+  .pinerr{color:var(--danger); font-size:12.5px;}
+
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:18px;
+  }
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:18px;
+    padding:18px; display:flex; flex-direction:column; gap:14px; box-shadow:var(--shadow);
+  }
+  .card-head{display:flex; align-items:center; gap:12px;}
+  .daybadge{
+    width:44px; height:44px; border-radius:50%; background:var(--accent-soft); color:var(--accent-strong);
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; flex:none;
+    font-family:"Noto Serif TC",serif;
+  }
+  .card-head .when{font-weight:700; font-size:15.5px; font-variant-numeric:tabular-nums;}
+  .card-head .what{color:var(--text-faint); font-size:12.5px; margin-top:1px;}
+
+  .lists{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .listcol h4{
+    margin:0 0 8px; font-size:12px; font-weight:700; letter-spacing:.04em; display:flex; align-items:center; gap:6px;
+  }
+  .listcol.att h4{color:var(--gold);}
+  .listcol.lv h4{color:var(--leave);}
+  .dot{width:7px; height:7px; border-radius:50%; background:currentColor; flex:none;}
+  .chips{display:flex; flex-wrap:wrap; gap:6px; min-height:26px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:5px; font-size:12.5px; font-weight:500;
+    border-radius:999px; padding:4px 6px 4px 10px; line-height:1.3;
+  }
+  .listcol.att .chip{background:var(--gold-soft); color:var(--gold-chip);}
+  .listcol.lv .chip{background:var(--leave-soft); color:var(--leave-chip);}
+  .chip button{
+    width:15px; height:15px; border-radius:50%; border:none; background:rgba(0,0,0,.12); color:inherit;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; font-size:10px; line-height:1;
+  }
+  .empty{color:var(--text-faint); font-size:12.5px; font-style:italic;}
+
+  .signup{
+    display:flex; flex-wrap:wrap; gap:8px; border-top:1px dashed var(--border); padding-top:12px;
+  }
+  .signup input[type=text]{
+    flex:1 1 140px; min-width:0; border:1px solid var(--border); border-radius:10px; padding:8px 11px;
+    font-size:14px; background:var(--bg); color:var(--text); font-family:inherit;
+  }
+  .signup input[type=text]:focus, .navbtn:focus-visible, .admintoggle:focus-visible, button:focus-visible{
+    outline:2px solid var(--accent); outline-offset:1px;
+  }
+  .btnrow{display:flex; gap:6px; flex-wrap:wrap;}
+  .btn{
+    border:none; border-radius:9px; padding:8px 13px; font-size:13px; font-weight:600; cursor:pointer;
+    font-family:inherit; white-space:nowrap;
+  }
+  .btn.att{background:var(--gold-soft); color:var(--gold-chip);}
+  .btn.lv{background:var(--leave-soft); color:var(--leave-chip);}
+  .btn.clear{background:var(--surface-2); color:var(--text-soft);}
+  .btn:hover{filter:brightness(1.06);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+
+  .adminbox{
+    border-top:1px dashed var(--border); padding-top:12px; display:flex; flex-direction:column; gap:8px;
+  }
+  .adminbox .lbl{font-size:11.5px; font-weight:700; color:var(--accent-strong); letter-spacing:.03em;}
+  .adminbox textarea{
+    width:100%; min-height:52px; resize:vertical; border:1px solid var(--border); border-radius:10px;
+    padding:8px 10px; font-size:13px; background:var(--bg); color:var(--text); font-family:inherit;
+  }
+  .adminrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .linkbtn{
+    background:none; border:none; color:var(--text-faint); font-size:12px; text-decoration:underline;
+    cursor:pointer; padding:0; font-family:inherit;
+  }
+  .linkbtn:hover{color:var(--danger);}
+
+  .toast{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+    background:var(--text); color:var(--bg); padding:10px 18px; border-radius:999px;
+    font-size:13.5px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
+    max-width:90vw; text-align:center; z-index:50;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+
+  .banner{
+    background:var(--gold-soft); color:var(--gold-chip); border:1px solid var(--border);
+    border-radius:14px; padding:12px 16px; font-size:13px; line-height:1.6;
+  }
+  .banner.danger{background:var(--leave-soft); color:var(--leave-chip);}
+
+  footer{color:var(--text-faint); font-size:12px; text-align:center; line-height:1.7;}
+  footer .updated{font-variant-numeric:tabular-nums;}
+
+  @media (max-width:480px){
+    .lists{grid-template-columns:1fr;}
+    .toolbar{flex-direction:column; align-items:stretch;}
+    .admintoggle{justify-content:center;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="root">
+  <div class="hero">
+    <div class="eyebrow">天使之戀・悠閒時光</div>
+    <h1>社團戰出席表</h1>
+    <p class="sub">載入中…</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ============================================================
+  // 設定區:把 Google Apps Script 部署後拿到的網址貼在這裡(結尾是 /exec)
+  // ============================================================
+  var API_URL = "https://script.google.com/macros/s/AKfycbzwTeVgMIr8qKQAa7OciQja-X8UO4p3baZ6pgw51WUff5LgPEzQVSh-krA3DB2KB1_eUg/exec";
+  var POLL_MS = 20000;
+
+  var WEEKDAY_CH = ["日","一","二","三","四","五","六"];
+  var SLOT_DEFS = [
+    { key:"wed21", dayOffset:0, time:"21:00", label:"週三場", day:"三" },
+    { key:"sun09", dayOffset:4, time:"09:00", label:"週日場（早）", day:"日" },
+    { key:"sun15", dayOffset:4, time:"15:00", label:"週日場（午）", day:"日" }
+  ];
+
+  function pad(n){ return n<10 ? "0"+n : ""+n; }
+  function dateKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+  function addDays(d,n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
+  function fmtMD(d){ return (d.getMonth()+1)+"/"+d.getDate(); }
+
+  function anchorWednesday(base, offsetWeeks){
+    var d = new Date(base); d.setHours(0,0,0,0);
+    var day = d.getDay();
+    var diff = (day - 3 + 7) % 7;
+    d.setDate(d.getDate() - diff);
+    d.setDate(d.getDate() + offsetWeeks*7);
+    return d;
+  }
+
+  function emptyWeek(){
+    var slots = {};
+    SLOT_DEFS.forEach(function(def){ slots[def.key] = { attending:[], leave:[] }; });
+    return { slots: slots };
+  }
+
+  function escName(s){ return String(s).slice(0,20).trim(); }
+
+  function rowsToWeeks(rows){
+    var weeks = {};
+    rows.forEach(function(row){
+      if (!weeks[row.week]) weeks[row.week] = emptyWeek();
+      var slot = weeks[row.week].slots[row.slot];
+      if (!slot) return;
+      if (row.status === "attending") slot.attending.push(row.name);
+      else if (row.status === "leave") slot.leave.push(row.name);
+    });
+    return weeks;
+  }
+
+  // ---- app state ----
+  var weeks = {};
+  var weekOffset = 0;
+  var adminUnlocked = false;
+  var pinDraft = "";
+  var pinError = "";
+  var pinBusy = false;
+  var showPinBar = false;
+  var loading = true;
+  var loadError = null;
+  var configured = API_URL.indexOf("PASTE_YOUR_") === -1;
+
+  function currentWeekKey(){ return dateKey(anchorWednesday(new Date(), weekOffset)); }
+
+  function apiGet(){
+    return fetch(API_URL + (API_URL.indexOf("?")===-1 ? "?" : "&") + "t=" + Date.now())
+      .then(function(r){ return r.json(); });
+  }
+  function apiPost(payload){
+    return fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    }).then(function(r){ return r.json(); });
+  }
+
+  function refresh(){
+    if (!configured) { loading = false; render(); return Promise.resolve(); }
+    return apiGet().then(function(res){
+      if (!res || !res.ok) throw new Error((res && res.error) || "bad_response");
+      weeks = rowsToWeeks(res.rows || []);
+      loading = false; loadError = null;
+      render();
+    }).catch(function(err){
+      loading = false;
+      loadError = String(err && err.message ? err.message : err);
+      render();
+    });
+  }
+
+  var toastTimer = null;
+  function showToast(msg){
+    var el = document.getElementById("toast");
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 3200);
+  }
+
+  function iconChevron(dir){
+    var d = dir === "l" ? "M10 3L5 8l5 5" : "M6 3l5 5-5 5";
+    return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="'+d+'"/></svg>';
+  }
+  function iconLock(open){
+    var shackle = open ? '<path d="M5 7V5a3 3 0 0 1 5.5-1.7"/>' : '<path d="M5 7V5a3 3 0 0 1 6 0v2"/>';
+    return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="7" width="10" height="6.5" rx="1.6"/>'+shackle+'</svg>';
+  }
+
+  function render(){
+    var root = document.getElementById("root");
+    var wed = anchorWednesday(new Date(), weekOffset);
+    var weekKey = dateKey(wed);
+    var week = weeks[weekKey] || emptyWeek();
+    var sun = addDays(wed, 4);
+    var rangeLabel = fmtMD(wed) + "（三）－" + fmtMD(sun) + "（日）";
+
+    var html = "";
+    html += '<div class="hero">';
+    html += '  <div class="eyebrow">天使之戀・悠閒時光</div>';
+    html += "  <h1>社團戰出席表</h1>";
+    html += '  <p class="sub">每週三 21:00・週日 09:00 / 15:00 社團戰,回報或查看本週出席狀況。</p>';
+    html += "</div>";
+
+    if (!configured){
+      html += '<div class="banner danger">這個頁面還沒接上資料來源:請把 Google Apps Script 部署後的網址貼到頁面原始碼裡的 <code>API_URL</code>。</div>';
+      root.innerHTML = html;
+      return;
+    }
+
+    if (loading){
+      html += '<div class="banner">載入中…</div>';
+      root.innerHTML = html;
+      return;
+    }
+
+    if (loadError){
+      html += '<div class="banner danger">讀取資料失敗(' + loadError + '）。請確認 Apps Script 已部署為「任何人」都能存取,或稍後重新整理再試一次。</div>';
+    }
+
+    html += '<div class="toolbar">';
+    html += '  <div class="weeknav">';
+    html += '    <button class="navbtn" id="prevWeek" aria-label="上一週">'+iconChevron("l")+'</button>';
+    html += '    <div class="weeklabel"><span class="range">'+rangeLabel+'</span>' + (weekOffset===0 ? '<span class="pill">本週</span>' : (weekOffset<0 ? '<span class="pill">已過去</span>' : '<span class="pill">即將到來</span>')) + '</div>';
+    html += '    <button class="navbtn" id="nextWeek" aria-label="下一週">'+iconChevron("r")+'</button>';
+    html += "  </div>";
+    html += '  <button class="admintoggle' + (adminUnlocked ? " on" : "") + '" id="adminToggle">' + iconLock(adminUnlocked) + (adminUnlocked ? "管理模式中・點擊鎖定" : "管理模式") + "</button>";
+    html += "</div>";
+
+    if (showPinBar && !adminUnlocked){
+      html += '<div class="pinbar">';
+      html += '  <input type="password" id="pinInput" placeholder="輸入管理密碼" value="'+pinDraft.replace(/"/g,"")+'" inputmode="numeric"'+(pinBusy?" disabled":"")+'>';
+      html += '  <button class="btn att" id="pinSubmit"'+(pinBusy?" disabled":"")+'>'+(pinBusy?"確認中…":"解鎖")+'</button>';
+      if (pinError) html += '<span class="pinerr">'+pinError+'</span>';
+      html += "</div>";
+    }
+
+    html += '<div class="grid">';
+    SLOT_DEFS.forEach(function(def){
+      var slotDate = addDays(wed, def.dayOffset);
+      var data = week.slots[def.key] || { attending:[], leave:[] };
+      html += '<div class="card" data-slot="'+def.key+'">';
+      html += '  <div class="card-head">';
+      html += '    <div class="daybadge">'+def.day+'</div>';
+      html += '    <div><div class="when">'+fmtMD(slotDate)+'（'+WEEKDAY_CH[slotDate.getDay()]+'）'+def.time+'</div><div class="what">'+def.label+'・社團戰</div></div>';
+      html += "  </div>";
+      html += '  <div class="lists">';
+      html += '    <div class="listcol att"><h4><span class="dot"></span>出席（'+data.attending.length+'）</h4><div class="chips" id="att-'+def.key+'"></div></div>';
+      html += '    <div class="listcol lv"><h4><span class="dot"></span>請假（'+data.leave.length+'）</h4><div class="chips" id="lv-'+def.key+'"></div></div>';
+      html += "  </div>";
+      html += '  <div class="signup">';
+      html += '    <input type="text" id="name-'+def.key+'" placeholder="輸入你的暱稱" maxlength="20">';
+      html += '    <div class="btnrow">';
+      html += '      <button class="btn att" data-act="att" data-slot="'+def.key+'">出席</button>';
+      html += '      <button class="btn lv" data-act="lv" data-slot="'+def.key+'">請假</button>';
+      html += '      <button class="btn clear" data-act="cancel" data-slot="'+def.key+'">取消回覆</button>';
+      html += "    </div>";
+      html += "  </div>";
+      if (adminUnlocked){
+        html += '  <div class="adminbox">';
+        html += '    <div class="lbl">管理・設定預定名單</div>';
+        html += '    <textarea id="bulk-'+def.key+'" placeholder="貼上名單,一行一個暱稱,會加入出席名單"></textarea>';
+        html += '    <div class="adminrow"><button class="btn att" data-act="bulk" data-slot="'+def.key+'">加入出席名單</button><button class="linkbtn" data-act="clear-slot" data-slot="'+def.key+'">清空這個場次</button></div>';
+        html += "  </div>";
+      }
+      html += "</div>";
+    });
+    html += "</div>";
+
+    html += '<footer>僅供悠閒時光公會內部協調使用・資料存放在管理者的 Google 試算表裡</footer>';
+    html += '<div class="toast" id="toast"></div>';
+
+    root.innerHTML = html;
+
+    SLOT_DEFS.forEach(function(def){
+      fillChips(document.getElementById("att-"+def.key), (week.slots[def.key]||{attending:[]}).attending, def.key);
+      fillChips(document.getElementById("lv-"+def.key), (week.slots[def.key]||{leave:[]}).leave, def.key);
+    });
+
+    wire();
+  }
+
+  function fillChips(container, names, slotKey){
+    if (!container) return;
+    container.innerHTML = "";
+    if (!names.length){
+      var e = document.createElement("span");
+      e.className = "empty";
+      e.textContent = "尚無回報";
+      container.appendChild(e);
+      return;
+    }
+    names.forEach(function(name){
+      var chip = document.createElement("span");
+      chip.className = "chip";
+      var t = document.createElement("span");
+      t.textContent = name;
+      chip.appendChild(t);
+      if (adminUnlocked){
+        var x = document.createElement("button");
+        x.type = "button";
+        x.textContent = "✕";
+        x.setAttribute("aria-label","移除 "+name);
+        x.addEventListener("click", function(){
+          apiPost({ action:"remove", pin: pinDraft, week: currentWeekKey(), slot: slotKey, name: name })
+            .then(function(res){
+              if (!res.ok){ showToast("移除失敗:管理密碼不正確"); return; }
+              refresh();
+            })
+            .catch(function(){ showToast("網路錯誤,請再試一次。"); });
+        });
+        chip.appendChild(x);
+      }
+      container.appendChild(chip);
+    });
+  }
+
+  function setSlot(slotKey, name, mode){
+    if (!name) return;
+    var status = mode === "att" ? "attending" : mode === "lv" ? "leave" : "none";
+    apiPost({ action:"set", week: currentWeekKey(), slot: slotKey, name: name, status: status })
+      .then(function(res){
+        if (!res.ok){ showToast("送出失敗,請再試一次。"); return; }
+        refresh();
+      })
+      .catch(function(){ showToast("網路錯誤,請檢查連線後再試一次。"); });
+  }
+
+  function wire(){
+    var prev = document.getElementById("prevWeek");
+    var next = document.getElementById("nextWeek");
+    if (prev) prev.addEventListener("click", function(){ weekOffset -= 1; render(); });
+    if (next) next.addEventListener("click", function(){ weekOffset += 1; render(); });
+
+    var toggle = document.getElementById("adminToggle");
+    if (toggle) toggle.addEventListener("click", function(){
+      if (adminUnlocked){ adminUnlocked = false; pinDraft=""; render(); return; }
+      showPinBar = !showPinBar; pinError=""; render();
+      var i = document.getElementById("pinInput");
+      if (i) i.focus();
+    });
+
+    var pinSubmit = document.getElementById("pinSubmit");
+    var pinInput = document.getElementById("pinInput");
+    function tryPin(){
+      var v = pinInput ? pinInput.value : "";
+      pinDraft = v; pinBusy = true; render();
+      apiPost({ action:"checkPin", pin: v }).then(function(res){
+        pinBusy = false;
+        if (res.ok && res.valid){
+          adminUnlocked = true; showPinBar=false; pinError=""; render();
+        } else {
+          pinError = "密碼錯誤"; render();
+        }
+      }).catch(function(){
+        pinBusy = false; pinError = "連線失敗,請再試一次"; render();
+      });
+    }
+    if (pinSubmit) pinSubmit.addEventListener("click", tryPin);
+    if (pinInput) pinInput.addEventListener("keydown", function(ev){ if (ev.key==="Enter") tryPin(); });
+
+    document.querySelectorAll('button[data-act="att"], button[data-act="lv"], button[data-act="cancel"]').forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var slotKey = btn.getAttribute("data-slot");
+        var act = btn.getAttribute("data-act");
+        var input = document.getElementById("name-"+slotKey);
+        var name = escName(input ? input.value : "");
+        if (!name){ showToast("請先輸入暱稱"); if(input) input.focus(); return; }
+        setSlot(slotKey, name, act);
+      });
+    });
+
+    document.querySelectorAll('button[data-act="bulk"]').forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var slotKey = btn.getAttribute("data-slot");
+        var ta = document.getElementById("bulk-"+slotKey);
+        var names = (ta ? ta.value : "").split("\n").map(escName).filter(Boolean);
+        if (!names.length) return;
+        apiPost({ action:"bulkAdd", pin: pinDraft, week: currentWeekKey(), slot: slotKey, names: names })
+          .then(function(res){
+            if (!res.ok){ showToast("加入失敗:管理密碼不正確"); return; }
+            refresh();
+          })
+          .catch(function(){ showToast("網路錯誤,請再試一次。"); });
+      });
+    });
+
+    document.querySelectorAll('button[data-act="clear-slot"]').forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var slotKey = btn.getAttribute("data-slot");
+        if (!window.confirm("確定要清空這個場次的名單嗎?")) return;
+        apiPost({ action:"clearSlot", pin: pinDraft, week: currentWeekKey(), slot: slotKey })
+          .then(function(res){
+            if (!res.ok){ showToast("清空失敗:管理密碼不正確"); return; }
+            refresh();
+          })
+          .catch(function(){ showToast("網路錯誤,請再試一次。"); });
+      });
+    });
+  }
+
+  render();
+  refresh();
+  if (configured) setInterval(refresh, POLL_MS);
+})();
+</script>
+</body>
+</html>
