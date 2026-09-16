@@ -415,9 +415,12 @@
         x.textContent = "✕";
         x.setAttribute("aria-label","移除 "+name);
         x.addEventListener("click", function(){
-          apiPost({ action:"remove", pin: pinDraft, week: currentWeekKey(), slot: slotKey, name: name })
+          var weekKey = currentWeekKey();
+          applyLocalSet(weekKey, slotKey, name, "none");
+          render();
+          apiPost({ action:"remove", pin: pinDraft, week: weekKey, slot: slotKey, name: name })
             .then(function(res){
-              if (!res.ok){ showToast("移除失敗:管理密碼不正確"); return; }
+              if (!res.ok){ showToast("移除失敗:管理密碼不正確"); }
               refresh();
             })
             .catch(function(){ showToast("網路錯誤,請再試一次。"); });
@@ -428,12 +431,30 @@
     });
   }
 
+  function ensureWeekLocal(weekKey){
+    if (!weeks[weekKey]) weeks[weekKey] = emptyWeek();
+    return weeks[weekKey];
+  }
+
+  function applyLocalSet(weekKey, slotKey, name, status){
+    var wk = ensureWeekLocal(weekKey);
+    var slot = wk.slots[slotKey];
+    if (!slot) return;
+    slot.attending = slot.attending.filter(function(n){ return n!==name; });
+    slot.leave = slot.leave.filter(function(n){ return n!==name; });
+    if (status === "attending") slot.attending.push(name);
+    if (status === "leave") slot.leave.push(name);
+  }
+
   function setSlot(slotKey, name, mode){
     if (!name) return;
     var status = mode === "att" ? "attending" : mode === "lv" ? "leave" : "none";
-    apiPost({ action:"set", week: currentWeekKey(), slot: slotKey, name: name, status: status })
+    var weekKey = currentWeekKey();
+    applyLocalSet(weekKey, slotKey, name, status);
+    render();
+    apiPost({ action:"set", week: weekKey, slot: slotKey, name: name, status: status })
       .then(function(res){
-        if (!res.ok){ showToast("送出失敗,請再試一次。"); return; }
+        if (!res.ok){ showToast("送出失敗,請再試一次。"); refresh(); return; }
         refresh();
       })
       .catch(function(){ showToast("網路錯誤,請檢查連線後再試一次。"); });
@@ -489,9 +510,12 @@
         var ta = document.getElementById("bulk-"+slotKey);
         var names = (ta ? ta.value : "").split("\n").map(escName).filter(Boolean);
         if (!names.length) return;
-        apiPost({ action:"bulkAdd", pin: pinDraft, week: currentWeekKey(), slot: slotKey, names: names })
+        var weekKey = currentWeekKey();
+        names.forEach(function(name){ applyLocalSet(weekKey, slotKey, name, "attending"); });
+        render();
+        apiPost({ action:"bulkAdd", pin: pinDraft, week: weekKey, slot: slotKey, names: names })
           .then(function(res){
-            if (!res.ok){ showToast("加入失敗:管理密碼不正確"); return; }
+            if (!res.ok){ showToast("加入失敗:管理密碼不正確"); }
             refresh();
           })
           .catch(function(){ showToast("網路錯誤,請再試一次。"); });
@@ -502,9 +526,13 @@
       btn.addEventListener("click", function(){
         var slotKey = btn.getAttribute("data-slot");
         if (!window.confirm("確定要清空這個場次的名單嗎?")) return;
-        apiPost({ action:"clearSlot", pin: pinDraft, week: currentWeekKey(), slot: slotKey })
+        var weekKey = currentWeekKey();
+        var wk = ensureWeekLocal(weekKey);
+        wk.slots[slotKey] = { attending:[], leave:[] };
+        render();
+        apiPost({ action:"clearSlot", pin: pinDraft, week: weekKey, slot: slotKey })
           .then(function(res){
-            if (!res.ok){ showToast("清空失敗:管理密碼不正確"); return; }
+            if (!res.ok){ showToast("清空失敗:管理密碼不正確"); }
             refresh();
           })
           .catch(function(){ showToast("網路錯誤,請再試一次。"); });
